@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import LoginPage from './pages/Login'
 import StudentsDashboard from './pages/students/StudentsDashboard'
 import LibrarianDashboard from './pages/librarian/LibrarianDashboard'
+import BookList from './pages/books/BookList'
 import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navabar'
 
@@ -24,6 +25,7 @@ function App() {
           </Route> */}
           <Route path='/dashboard-student' element={<StudentsDashboard />} />
           <Route path='/dashboard-librarian' element={<LibrarianDashboard />} />
+          <Route path='/booklist' element={<BookList />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
