@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchBooks } from '../../services/api';
 import {
   Container,
   Box,
@@ -14,7 +15,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Pagination
+  Pagination,
+  Paper
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import SearchIcon from '@mui/icons-material/Search';
@@ -30,26 +32,44 @@ export default function BookList(){
     genre: ''
   });
   const [genres, setGenres] = useState([]);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   const fetchBooksAndGenres = async () => {
+  //     try {
+  //       const [booksRes, genresRes] = await Promise.all([
+  //         axios.get('/api/books'),
+  //         axios.get('/api/books/genres')
+  //       ]);
+  //       setBooks(booksRes.data);
+  //       setGenres(genresRes.data);
+  //     } catch (err) {
+  //       console.error('Error fetching data:', err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchBooksAndGenres();
+  // }, []);
+
   useEffect(() => {
-    const fetchBooksAndGenres = async () => {
+    const loadBooks = async () => {
       try {
-        const [booksRes, genresRes] = await Promise.all([
-          axios.get('/api/books'),
-          axios.get('/api/books/genres')
-        ]);
-        setBooks(booksRes.data);
-        setGenres(genresRes.data);
+        const data = await fetchBooks();
+        setBooks(data);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchBooksAndGenres();
+    
+    loadBooks();
   }, []);
+
+
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;

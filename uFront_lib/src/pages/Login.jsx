@@ -16,6 +16,7 @@ import {
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const defaultTheme = createTheme();
 
@@ -29,18 +30,42 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!email.trim() || !password.trim()) {
-      setError('Todos los campos son obligatorios');
-      return;
-    }
     setError('');
     setLoading(true);
 
     try {
-      await login(email, password);
+      // 1. Enviar credenciales al backend
+      const response = await axios.post('http://localhost:3001/api/auth/login', {
+        email,
+        password
+      });
+
+      // 2. Guardar el token en el almacenamiento local
+      localStorage.setItem('token', response.data.token);
+      
+      // 3. Guardar datos del usuario en el estado (si usas contexto o estado global)
+      const userData = response.data.data.user;
+      
+      // 4. Redirigir según el rol
+      if (userData.role === 'librarian') {
+        navigate('/librarian/dashboard');
+      } else {
+        navigate('/student/dashboard');
+      }
+
     } catch (err) {
-      setError('Wrong credentials, please try again');
+      // Manejar diferentes tipos de errores
+      if (err.response) {
+        // Error de respuesta del servidor (4xx, 5xx)
+        setError(err.response.data.message || 'Credenciales incorrectas');
+      } else if (err.request) {
+        // Error de conexión (no se recibió respuesta)
+        setError('No se pudo conectar al servidor. Intenta nuevamente.');
+      } else {
+        // Error al configurar la solicitud
+        setError('Error al enviar la solicitud');
+      }
+    } finally {
       setLoading(false);
     }
   };
