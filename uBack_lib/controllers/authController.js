@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users');
+const bcrypt = require('bcrypt');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/env');
 const AppError = require('../utils/appError');
 
@@ -15,13 +16,20 @@ exports.login = async (req, res, next) => {
 
     // 1. Verificar si el usuario existe
     const user = await User.findOne({ email }).select('+password');
+    
     if (!user) {
       return next(new AppError('Credenciales incorrectas', 401));
     }
 
+
+
     // 2. Verificar contraseña
-    const isCorrect = await user.comparePassword(password);
+    const isCorrect = await bcrypt.compare(password, user.password);
+    console.log(isCorrect)
+    
+  
     if (!isCorrect) {
+      console.log("enrta a cmparar")
       return next(new AppError('Credenciales incorrectas', 401));
     }
 
@@ -44,6 +52,7 @@ exports.login = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+    
   }
 };
 
@@ -84,4 +93,29 @@ exports.restrictTo = (...roles) => {
     }
     next();
   };
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    // El middleware de autenticación ya adjuntó el usuario al request
+    const user = await User.findById(req.user.id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'Usuario no encontrado'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error('Error en getMe:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener información del usuario'
+    });
+  }
 };

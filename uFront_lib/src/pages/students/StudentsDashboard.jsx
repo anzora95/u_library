@@ -29,7 +29,7 @@ export default function StudentsDashboard (){
               </Typography>
               <Button 
                 variant="contained" 
-                onClick={() => navigate('/student/books')}
+                onClick={() => navigate('/student/booklist')}
                 fullWidth
               >
                 Ver Catálogo

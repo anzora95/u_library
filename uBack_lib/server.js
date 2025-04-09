@@ -8,8 +8,13 @@ const errorHandler = require('./middleware/errorMiddleware');
 
 const app = express();
 
-// Middlewares
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Asegúrate que coincide con tu URL de frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  exposedHeaders: ['Authorization'],
+  credentials: true
+}));
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());

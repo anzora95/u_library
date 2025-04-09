@@ -24,6 +24,8 @@ export default function AddBookForm(){
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const API_URL = 'http://localhost:3001/api'; 
+
   const genres = [
     'Ficción',
     'No ficción',
@@ -49,7 +51,7 @@ export default function AddBookForm(){
     setSuccess('');
 
     try {
-      await axios.post('/api/books', bookData);
+      await axios.post(`${API_URL}/books`, bookData);
       setSuccess('Libro agregado correctamente');
       setBookData({
         title: '',
@@ -59,6 +61,7 @@ export default function AddBookForm(){
         isbn: ''
       });
     } catch (err) {
+      console.log(err)
       setError(err.response?.data?.message || 'Error al agregar el libro');
     }
   };
